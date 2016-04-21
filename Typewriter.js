@@ -48,7 +48,7 @@ Typewriter.prototype.Start = function() {
                     n = parseInt(arr[1].replace(/[^\d]/g, ''));
                 }
                 
-                if (operators[c].match(/backspace\:.*\:\d*/)) {
+                if (operators[c].match(/backspace\:.+\:\d+/)) {
                     d = parseInt(arr[2]);
                 }
                 
