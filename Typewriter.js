@@ -1,5 +1,5 @@
 $(document).ready(function() {
-    var TW = new Typewriter({ target: '#Typewriter', type: ["T", "[r:1]", "Test", "[w:5000]"] })
+    var TW = new Typewriter({ target: '#Typewriter', type: ["Test", "[wait:1500|backspace:4|wait:500]", "Its Good", "[wait:5000]"], delay: 200, removeDelay: 100 })
 })
 
 
@@ -13,18 +13,41 @@ function Typewriter(args) {
 }
 Typewriter.prototype.Start = function() {
     var that = this;
-    ///[\[\]]|(?:w\:\d*)/g
+    ///[\[\]]|(?!\w*\:\d+)\|.*/g               Match all but first
+    ///(?:\w*\:\d+)/                       Match only first
     this.Repeat();
-    if (this.str[0].match(/(?=\[w\:\d+\])/g)) {
-        var wait = parseInt(this.str.shift().replace(/[\[\]w\:]/g, ''));
-        setTimeout(function(){
-            that.Repeat();
-            that.OutPut(that.str.shift());
-        }, wait);
-    }
-    else if (this.str[0].match(/(?=\[r\:\d+\])/g)) {
-        var s = this.str.shift();
-        this.Backspace(parseInt(s.replace(/[\[\][\w\d+]*r\:]/g, '')));
+    if (this.str[0].match(/[\[\]]|(?!\w*\:\d+)\|.*/g)) {
+        var operators = this.str.shift().replace(/[\[\]]/g, '').split('|');
+        operators.forEach(function(v) {
+        });
+        var c = 0;
+        loop();
+        function loop() {
+            if (operators[c].indexOf("wait") > -1) {
+                setTimeout(function(){
+                    if (c == operators.length-1) {
+                        that.Repeat();
+                        that.Start();
+                    }
+                    else {
+                        c++;
+                        loop();
+                    }
+                }, parseInt(operators[c].replace(/[^\d]/g, '')));
+            }
+            else if (operators[c].indexOf('backspace') > -1) {
+                that.Backspace(parseInt(operators[c].replace(/[^\d]/g, '')), function() {
+                    if (c == operators.length-1) {
+                        return true;
+                    }
+                    else {
+                        c++;
+                        loop();
+                        return false;
+                    }
+                });
+            }
+        }
     }
     else {
         this.OutPut(this.str.shift());
@@ -43,23 +66,27 @@ Typewriter.prototype.OutPut = function(letters) {
                 c++;
                 Type();
             }
-        }, this.delay || 800);
+        }, that.delay || 800);
     }
 }
-Typewriter.prototype.Backspace = function(n) {
+Typewriter.prototype.Backspace = function(n, complete) {
     var that = this;
+    if(!$.isFunction(complete)) complete = function() {};
     var c = 1;
     if (n === 0) return;
     Remove();
     function Remove() {
         setTimeout(function() {
             that.marker.prev().remove();
-            if (c == n) that.Start();
+            if (c == n) {
+                if (!complete()) return;
+                that.Start();
+            }
             else {
                 c++;
                 Remove();
             }
-        }, this.removeDelay || 400);
+        }, that.removeDelay || 400);
     }
 }
 Typewriter.prototype.Repeat = function() {
