@@ -2,6 +2,13 @@
     <head>
         <script type="text/javascript" src="https://code.jquery.com/jquery-2.2.3.min.js"></script>
         <script type="text/javascript" src="Typewriter.js"></script>
+        <script type="text/javascript">
+            $(document).ready(function() {
+                var TW = new Typewriter({ target: '#Typewriter', type: ["Typo", "[wait:1500|backspace:1|wait:500]", "ewriter", "[wait:5000|backspace:10|wait:1500]", "Lets write more!", "[wait:1500|backspace:16|wait:500]", "Cool, Right?!", "[wait:5000]"], delay: 200, removeDelay: 100 });
+            })
+        </script>
     </head>
-    <body><h1 id="Typewriter" style="text-align:center"></h1></body>
+    <body>
+        <h1 id="Typewriter" style="text-align:center"></h1>
+    </body>
 </html>

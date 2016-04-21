@@ -1,20 +1,13 @@
-$(document).ready(function() {
-    var TW = new Typewriter({ target: '#Typewriter', type: ["Test", "[wait:1500|backspace:4|wait:500]", "Its Good", "[wait:5000]"], delay: 200, removeDelay: 100 })
-})
-
-
 function Typewriter(args) {
     this.str = args.type.slice();
     this.origin = args.type.slice();
-    this.marker = $('<span data-marker>|</span>').appendTo(args.target);
+    this.marker = $('<span data-marker="">|</span>').appendTo(args.target);
     this.delay = args.delay;
     this.removeDelay = args.removeDelay;
     this.Start();
 }
 Typewriter.prototype.Start = function() {
     var that = this;
-    ///[\[\]]|(?!\w*\:\d+)\|.*/g               Match all but first
-    ///(?:\w*\:\d+)/                       Match only first
     this.Repeat();
     if (this.str[0].match(/[\[\]]|(?!\w*\:\d+)\|.*/g)) {
         var operators = this.str.shift().replace(/[\[\]]/g, '').split('|');
@@ -86,12 +79,18 @@ Typewriter.prototype.Backspace = function(n, complete) {
                 c++;
                 Remove();
             }
-        }, that.removeDelay || 400);
+        }, that.removeDelay || that.delay || 400);
     }
 }
 Typewriter.prototype.Repeat = function() {
+    if (this.str.length == 0) $(this).trigger('Typewriter.Done');
     if (this.repeat != false && this.str.length == 0) {
         this.str = this.origin.slice();
         this.marker.siblings().remove();
     }
+}
+Typewriter.prototype.loadCommands = function(arr, start) {
+    if (!start) start = false;
+    this.origin = arr.slice();
+    if(start) this.Start();
 }
