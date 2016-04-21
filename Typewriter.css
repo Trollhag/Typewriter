@@ -1,0 +1,8 @@
+.typewriter-marker {
+    animation: example 200ms linear 300ms infinite;
+}
+@keyframes marker-blink {
+    0%    {opacity: 1;}
+    50%   {opacity: 0;}
+    100%  {opacity: 1;}
+}
