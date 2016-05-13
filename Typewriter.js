@@ -9,7 +9,7 @@ function Typewriter(args) {
 }
 Typewriter.prototype.Start = function() {
     var that = this;
-    // Makes it possible to backtrack to previous instance, looks better than C/P code.
+    // Makes it possible to backtrack to previous instance, looks better than C&P code.
     if (Number.isInteger(this.str[0]) && !Number.isInteger(this.origin[this.str[0]]) && this.origin[this.str[0]] != undefined) {
         this.instance = this.origin[this.str.shift()];
     }
@@ -20,7 +20,6 @@ Typewriter.prototype.Start = function() {
     if (this.instance.match(/[\[\]]|(?!\w*\:\d+)\|.*/g)) {
         var operators = this.instance.replace(/[\[\]]/g, '').split('|');
         var c = 0;
-        loop();
         
         function loop() {
             if (operators[c].indexOf("wait") > -1) {
@@ -64,6 +63,7 @@ Typewriter.prototype.Start = function() {
                 });
             }
         }
+        loop();
     }
     else {
         this.OutPut(this.instance);
@@ -71,14 +71,14 @@ Typewriter.prototype.Start = function() {
 }
 Typewriter.prototype.OutPut = function(letters) {
     /* TODO:
-        - Add option to change delay/type-speed on instance-level
-        - Add algorithm for delay/type-speed (eg. easeing, swing, ...)
+        - Add algorithm for delay/type-speed (eg. easing, swing, etc...)
     */
     var that = this;
     var l = letters.split('');
     var c = 0;
     Type();
     function Type() {
+        if (that.death) return;
         setTimeout(function() {
             $('<span>' + l[c] + '</span>').insertBefore(that.marker);
             if (c == l.length-1) that.Start();
@@ -96,6 +96,7 @@ Typewriter.prototype.Backspace = function(n, d, complete) {
     if (n === 0) return;
     Remove();
     function Remove() {
+        if (that.death) return;
         setTimeout(function() {
             that.marker.prev().remove();
             if (c == n) {
@@ -120,4 +121,7 @@ Typewriter.prototype.loadCommands = function(arr, start) {
     if (!start) start = false;
     this.origin = arr.slice();
     if(start) this.Start();
+}
+Typewriter.prototype.Kill = function() {
+    this.death = true;
 }
